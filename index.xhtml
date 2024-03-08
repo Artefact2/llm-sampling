@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>llm-sampling</title>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+            integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous" />
+    <script src="index.js" />
+    <style>
+      div#samplers > div { opacity: 0.5; cursor: grab; }
+      div#samplers > div:has(input:checked) { opacity: 1; }
+    </style>
+  </head>
+  <body class="container mt-4">
+    <div class="row">
+      <select id="prompts" />
+      <h1 class="mt-4"><label for="prompts" /></h1>
+    </div>
+    <div class="row mt-4" id="samplers">
+      <div class="col-lg-3 col-sm-6">
+        <div class="container alert alert-primary me-4">
+          <div class="row">
+            <h3><input type="checkbox" id="temperature" /> <label for="temperature">Temperature</label></h3>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input type="range" value="1" min="0.01" max="5" step="0.01" class="align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="1" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="container alert alert-primary me-4">
+          <div class="row">
+            <h3><input type="checkbox" id="top_k" /> <label for="top_k">Top K</label></h3>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input type="range" value="50" min="1" max="50" step="1" class="align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="50" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="container alert alert-primary me-4">
+          <div class="row">
+            <h3><input type="checkbox" id="top_p" /> <label for="top_p">Top P</label></h3>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input type="range" value="1" min="0" max="1" step="0.01" class="align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="1" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="container alert alert-primary me-4">
+          <div class="row">
+            <h3><input type="checkbox" id="min_p" /> <label for="min_p">Min P</label></h3>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input type="range" value="0" min="0" max="1" step="0.01" class="align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="0" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="container alert alert-primary me-4">
+          <div class="row">
+            <h3><input type="checkbox" id="top_a" /> <label for="top_a">Top A</label></h3>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input type="range" value="0" min="0" max="1" step="0.01" class="align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="0" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="retained">
+      <table class="table table-striped text-end">
+        <thead>
+          <tr>
+            <th class="col-2">Token</th>
+            <th class="col-1">Probability</th>
+            <th class="col-9" />
+          </tr>
+        </thead>
+        <tbody />
+      </table>
+    </div>
+  </body>
+</html>
