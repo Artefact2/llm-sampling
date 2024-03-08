@@ -44,8 +44,10 @@ const samplers = {
 	},
 	top_a: (tokens, probs) => {
 		if(tokens.length === 0) return;
-		let p = $("input#top_a").closest('div.alert').find('input[type="range"]').val();
-		let cutoff = probs[tokens[0]] * p * p;
+		let a = $("input#top_a").closest('div.alert').find('input[type="range"]').val();
+		probs = normalize(tokens, probs);
+		let cutoff = probs[tokens[0]] * probs[tokens[0]] * a;
+		probs = normalize(tokens, probs);
 		for(let tok of tokens) {
 			if(probs[tok] < cutoff) {
 				delete probs[tok];
