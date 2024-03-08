@@ -21,6 +21,7 @@ const samplers = {
 	top_p: (tokens, probs) => {
 		let p = $("input#top_p").closest('div.alert').find('input[type="range"]').val();
 		let i = 0, P = 0.0;
+		probs = normalize(tokens, probs);
 		for(let tok of tokens) {
 			if(P >= p) {
 				delete probs[tok];
@@ -79,8 +80,7 @@ const update_sample = () => {
 	let probs = JSON.parse(JSON.stringify(prompts[i][1]));
 	$("div#samplers div.alert:has(input:checked)").each((idx, el) => {
 		let sname = $(el).find('input:checked').prop('id');
-		let tokens = Object.keys(probs);
-		probs = samplers[sname](tokens, normalize(tokens, probs));
+		probs = samplers[sname](Object.keys(probs), probs);
 	});
 	let tokens = Object.keys(probs);
 	probs = normalize(tokens, probs);
@@ -104,7 +104,7 @@ const update_sample = () => {
 		div.appendChild(pbar);
 		pbar.classList.add('progress-bar');
 		pbar.classList.add('bg-primary');
-		pbar.setAttribute('style', 'width: ' + (100.0 * probs[t]).toFixed(2) + '%;')
+		pbar.setAttribute('style', 'width: ' + (100.0 * probs[t] / probs[tokens[0]]).toFixed(2) + '%;')
 	}
 };
 
