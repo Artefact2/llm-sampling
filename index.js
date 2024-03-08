@@ -54,6 +54,17 @@ const samplers = {
 	},
 };
 
+const normalize = (tokens, probs) => {
+	let sum = 0.0;
+	for(let t of tokens) {
+		sum += probs[t];
+	}
+	for (let t of tokens) {
+		probs[t] /= sum;
+	}
+        return probs;
+};
+
 const update_prompt = () => {
 	let s = $("select#prompts");
 	let prompt = s.children()[s.val()].textContent;
@@ -68,12 +79,11 @@ const update_sample = () => {
 	let probs = JSON.parse(JSON.stringify(prompts[i][1]));
 	$("div#samplers div.alert:has(input:checked)").each((idx, el) => {
 		let sname = $(el).find('input:checked').prop('id');
-		probs = samplers[sname](Object.keys(probs), probs);
+		let tokens = Object.keys(probs);
+		probs = samplers[sname](tokens, normalize(tokens, probs));
 	});
 	let tokens = Object.keys(probs);
-	for(let t of tokens) {
-		sum += probs[t];
-	}
+	probs = normalize(tokens, probs);
 	let pcf = new Intl.NumberFormat(undefined, { style: "percent", maximumFractionDigits: 3, minimumFractionDigits: 3 });
 	for(let t of tokens) {
 		let tr = document.createElement('tr');
@@ -83,7 +93,7 @@ const update_sample = () => {
 		td.textContent = t;
 		td = document.createElement('td');
 		tr.appendChild(td);
-		td.textContent = pcf.format(probs[t] / sum);
+		td.textContent = pcf.format(probs[t]);
 		td = document.createElement('td');
 		tr.appendChild(td);
 		let div = document.createElement('div');
@@ -94,7 +104,7 @@ const update_sample = () => {
 		div.appendChild(pbar);
 		pbar.classList.add('progress-bar');
 		pbar.classList.add('bg-primary');
-		pbar.setAttribute('style', 'width: ' + (100.0 * probs[t] / sum).toFixed(2) + '%;')
+		pbar.setAttribute('style', 'width: ' + (100.0 * probs[t]).toFixed(2) + '%;')
 	}
 };
 
