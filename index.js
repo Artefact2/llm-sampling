@@ -129,6 +129,7 @@ $(() => {
 		});
 	}
 
+	$("[data-bs-toggle='tooltip']").each((i, e) => new bootstrap.Tooltip(e));
 	$("select#prompts").on('change', update_prompt);
 	$("select#prompts").on('input', update_prompt);
 	$("div#samplers input").on('input', update_sample);

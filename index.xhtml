@@ -17,6 +17,7 @@
     <style>
       div#samplers > div { opacity: 0.5; cursor: grab; }
       div#samplers > div:has(input:checked) { opacity: 1; }
+      span.has-tooltip { display: inline-block; text-align: center; border: 1px solid black; border-radius: 100%; width: 1.2em; height: 1.2em; font-size: 0.8em; }
     </style>
   </head>
   <body class="container mt-4">
@@ -28,7 +29,7 @@
       <div class="col-lg-3 col-sm-6">
         <div class="container alert alert-primary me-4">
           <div class="row">
-            <h3><input type="checkbox" id="temperature" /> <label for="temperature">Temperature</label></h3>
+            <h3><input type="checkbox" id="temperature" /> <label for="temperature">Temperature</label> <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Scale token probabilities using a power function x^(1/Temp)">?</span></h3>
           </div>
           <div class="row">
             <div class="col-9">
@@ -43,7 +44,7 @@
       <div class="col-lg-3 col-sm-6">
         <div class="container alert alert-primary me-4">
           <div class="row">
-            <h3><input type="checkbox" id="top_k" /> <label for="top_k">Top K</label></h3>
+            <h3><input type="checkbox" id="top_k" /> <label for="top_k">Top K</label> <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keep the K tokens with the highest probability">?</span></h3>
           </div>
           <div class="row">
             <div class="col-9">
@@ -58,7 +59,7 @@
       <div class="col-lg-3 col-sm-6">
         <div class="container alert alert-primary me-4">
           <div class="row">
-            <h3><input type="checkbox" id="top_p" /> <label for="top_p">Top P</label></h3>
+            <h3><input type="checkbox" id="top_p" /> <label for="top_p">Top P</label> <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keep most probable tokens until the sum of their probabilities is greater than P">?</span></h3>
           </div>
           <div class="row">
             <div class="col-9">
@@ -73,7 +74,7 @@
       <div class="col-lg-3 col-sm-6">
         <div class="container alert alert-primary me-4">
           <div class="row">
-            <h3><input type="checkbox" id="min_p" /> <label for="min_p">Min P</label></h3>
+            <h3><input type="checkbox" id="min_p" /> <label for="min_p">Min P</label> <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keep tokens with probability greater than P*T, where T is the probability of the most likely token">?</span></h3>
           </div>
           <div class="row">
             <div class="col-9">
@@ -88,7 +89,7 @@
       <div class="col-lg-3 col-sm-6">
         <div class="container alert alert-primary me-4">
           <div class="row">
-            <h3><input type="checkbox" id="top_a" /> <label for="top_a">Top A</label></h3>
+            <h3><input type="checkbox" id="top_a" /> <label for="top_a">Top A</label>  <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keep tokens with probability greater than A*T^2, where T is the probability of the most likely token">?</span></h3>
           </div>
           <div class="row">
             <div class="col-9">
