@@ -33,18 +33,43 @@
           </div>
           <div class="row">
             <div class="col-9">
-              <input id="temperature-T" type="range" value="1" min="0.01" max="5" step="0.01" class="align-middle" />
+              <input id="temperature-T" type="range" value="1" min="0.01" max="5" step="0.01" class="w-100 align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="1" />
             </div>
           </div>
           <div class="row mt-2">
-            <h6><input type="checkbox" id="temperature-SS" /> <label for="temperature-SS">Smoothing factor</label></h6>
+            <h6><input type="checkbox" id="temperature-dyn" /> <label for="temperature-dyn">Dynamic temperature</label> <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Adjusts temperature based on entropy of tokens">?</span></h6>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <small>Range</small>
+            </div>
+            <div class="col-6">
+              <input id="temperature-dyn-range" type="range" value="0" min="0" max="2" step="0.01" class="w-100 align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="0" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <small>Exponent</small>
+            </div>
+            <div class="col-6">
+              <input id="temperature-dyn-exponent" type="range" value="1" min="0" max="2" step="0.01" class="w-100 align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="1" />
+            </div>
+          </div>
+          <div class="row mt-2">
+            <h6><input type="checkbox" id="temperature-SS" /> <label for="temperature-SS">Smoothing factor</label> <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Adjusts probabilities using the formula T*exp(-f*log(P/T)^2), where T is the probability of the most likely token, f is the smoothing factor, and P is the probability of the current token">?</span></h6>
           </div>
           <div class="row">
             <div class="col-9">
-              <input id="temperature-SS-SF" type="range" value="0" min="0" max="2" step="0.01" class="align-middle" />
+              <input id="temperature-SS-SF" type="range" value="0" min="0" max="2" step="0.01" class="w-100 align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="1" />
@@ -59,7 +84,7 @@
           </div>
           <div class="row">
             <div class="col-9">
-              <input type="range" value="50" min="1" max="50" step="1" class="align-middle" />
+              <input type="range" value="50" min="1" max="50" step="1" class="w-100 align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="50" />
@@ -74,7 +99,7 @@
           </div>
           <div class="row">
             <div class="col-9">
-              <input type="range" value="1" min="0" max="1" step="0.01" class="align-middle" />
+              <input type="range" value="1" min="0" max="1" step="0.01" class="w-100 align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="1" />
@@ -89,7 +114,7 @@
           </div>
           <div class="row">
             <div class="col-9">
-              <input type="range" value="0" min="0" max="1" step="0.01" class="align-middle" />
+              <input type="range" value="0" min="0" max="1" step="0.01" class="w-100 align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="0" />
@@ -104,7 +129,7 @@
           </div>
           <div class="row">
             <div class="col-9">
-              <input type="range" value="0" min="0" max="1" step="0.01" class="align-middle" />
+              <input type="range" value="0" min="0" max="1" step="0.01" class="w-100 align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="0" />

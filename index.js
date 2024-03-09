@@ -2,13 +2,25 @@ let prompts;
 
 const samplers = {
 	temperature: (tokens, probs) => {
-		let T = 1.0 / $("input#temperature-T").val();
+		if(tokens.length <= 1) return;
+		let T = $("input#temperature-T").val();
+		if($("input#temperature-dyn").prop('checked')) {
+			let range = $("input#temperature-dyn-range").val();
+			let expo = $("input#temperature-dyn-exponent").val();
+			/* reference: https://github.com/YellowRoseCx/koboldcpp-rocm/blob/main/llama.cpp#L10652-L10670 */
+			probs = normalize(tokens, probs);
+			let max_entropy = -Math.log(1.0 / tokens.length), entropy = 0.0;
+			for(let tok of tokens) {
+				entropy -= probs[tok] * Math.log(probs[tok]);
+			}
+			T = Math.max(0.0, T - range) + 2 * range * Math.pow(entropy / max_entropy, expo);
+		}
+		T = 1.0 / T;
 		for(let tok of tokens) {
 			probs[tok] = Math.pow(probs[tok], T);
 		}
-		let ss = $("input#temperature-SS").prop('checked');
 		let sf = $("input#temperature-SS-SF").val();
-		if(ss > 0 && sf > 0) {
+		if($("input#temperature-SS").prop('checked') && sf > 0) {
 			/* reference: https://github.com/YellowRoseCx/koboldcpp-rocm/blob/main/llama.cpp#L10689-L10699 */
 			for(let tok of tokens) {
 				probs[tok] = probs[tokens[0]] * Math.exp(
