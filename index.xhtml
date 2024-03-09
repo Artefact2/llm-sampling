@@ -16,7 +16,7 @@
     <script src="index.js" />
     <style>
       div#samplers > div { opacity: 0.5; cursor: grab; }
-      div#samplers > div:has(input:checked) { opacity: 1; }
+      div#samplers > div:has(h3 > input:checked) { opacity: 1; }
       span.has-tooltip { display: inline-block; text-align: center; border: 1px solid black; border-radius: 100%; width: 1.2em; height: 1.2em; font-size: 0.8em; }
     </style>
   </head>
@@ -33,7 +33,18 @@
           </div>
           <div class="row">
             <div class="col-9">
-              <input type="range" value="1" min="0.01" max="5" step="0.01" class="align-middle" />
+              <input id="temperature-T" type="range" value="1" min="0.01" max="5" step="0.01" class="align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="1" />
+            </div>
+          </div>
+          <div class="row mt-2">
+            <h6><input type="checkbox" id="temperature-SS" /> <label for="temperature-SS">Smoothing factor</label></h6>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input id="temperature-SS-SF" type="range" value="0" min="0" max="2" step="0.01" class="align-middle" />
             </div>
             <div class="col-3">
               <input type="text" class="w-100" value="1" />

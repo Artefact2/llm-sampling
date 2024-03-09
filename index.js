@@ -2,9 +2,19 @@ let prompts;
 
 const samplers = {
 	temperature: (tokens, probs) => {
-		let T = 1.0 / $("input#temperature").closest('div.alert').find('input[type="range"]').val();
+		let T = 1.0 / $("input#temperature-T").val();
 		for(let tok of tokens) {
 			probs[tok] = Math.pow(probs[tok], T);
+		}
+		let ss = $("input#temperature-SS").prop('checked');
+		let sf = $("input#temperature-SS-SF").val();
+		if(ss > 0 && sf > 0) {
+			/* reference: https://github.com/YellowRoseCx/koboldcpp-rocm/blob/main/llama.cpp#L10689-L10699 */
+			for(let tok of tokens) {
+				probs[tok] = probs[tokens[0]] * Math.exp(
+					-sf * Math.pow(Math.log(probs[tok] / probs[tokens[0]]), 2.0)
+				);
+			}
 		}
 		return probs;
 	},
@@ -80,7 +90,7 @@ const update_sample = () => {
 	let tbody = $("div#retained tbody").empty()[0];
 	let sum = 0.0;
 	let probs = JSON.parse(JSON.stringify(prompts[i][1]));
-	$("div#samplers div.alert:has(input:checked)").each((idx, el) => {
+	$("div#samplers div.alert:has(h3 > input:checked)").each((idx, el) => {
 		let sname = $(el).find('input:checked').prop('id');
 		probs = samplers[sname](Object.keys(probs), probs);
 	});
@@ -127,7 +137,7 @@ $(() => {
 	for(let i in types) {
 		$("div#samplers input[type='" + types[i] + "']").on('input', e => {
 			let v = $(e.target).val();
-			$(e.target).closest('div.alert').find('input[type="' + types[1-i] + '"]').val(v);
+			$(e.target).closest('div.row').find('input[type="' + types[1-i] + '"]').val(v);
 		});
 	}
 
