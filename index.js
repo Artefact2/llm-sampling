@@ -2,7 +2,7 @@ let prompts;
 
 const samplers = {
 	temperature: (tokens, probs) => {
-		if(tokens.length <= 1) return;
+		if(tokens.length <= 1) return probs;
 		let T = $("input#temperature-T").val();
 		if($("input#temperature-dyn").prop('checked')) {
 			let range = $("input#temperature-dyn-range").val();
@@ -54,7 +54,7 @@ const samplers = {
 		return probs;
 	},
 	min_p: (tokens, probs) => {
-		if(tokens.length === 0) return;
+		if(tokens.length === 0) return probs;
 		let p = $("input#min_p").closest('div.alert').find('input[type="range"]').val();
 		let cutoff = probs[tokens[0]] * p;
 		for(let tok of tokens) {
@@ -65,7 +65,7 @@ const samplers = {
 		return probs;
 	},
 	top_a: (tokens, probs) => {
-		if(tokens.length === 0) return;
+		if(tokens.length === 0) return probs;
 		let a = $("input#top_a").closest('div.alert').find('input[type="range"]').val();
 		probs = normalize(tokens, probs);
 		let cutoff = probs[tokens[0]] * probs[tokens[0]] * a;
@@ -73,6 +73,27 @@ const samplers = {
 		for(let tok of tokens) {
 			if(probs[tok] < cutoff) {
 				delete probs[tok];
+			}
+		}
+		return probs;
+	},
+	tfs_z: (tokens, probs) => {
+		if(tokens.length <= 2) return probs;
+		let z = $("input#tfs_z").closest('div.alert').find('input[type="range"]').val();
+		if(z >= 1.0) return probs;
+		let d1 = [], d2 = [], d2_val, d2_sum = 0.0, N = tokens.length;
+		for(let i = 0; i < tokens.length - 1; ++i) {
+			d1.push(probs[tokens[i]] - probs[tokens[i+1]]);
+		}
+		for(let i = 0; i < tokens.length - 2; ++i) {
+			d2.push(d2_val = Math.abs(d1[i] - d1[i+1]));
+			d2_sum += d2_val;
+		}
+		let cutoff = d2_sum * z, total = 0.0;
+		for(let i = 0; i < tokens.length; ++i) {
+			if(i < d2.length) total += d2[i];
+			if(i >= 1 && total > cutoff) {
+				delete probs[tokens[i]];
 			}
 		}
 		return probs;
