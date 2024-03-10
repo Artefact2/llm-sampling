@@ -164,6 +164,22 @@
           <div class="row chart mt-2" />
         </div>
       </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="container alert alert-primary me-4">
+          <div class="row">
+            <h3><input type="checkbox" id="typ_p" /> <label for="typ_p">Typical P</label>  <span class="has-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort tokens based on the difference between log-probability and entropy of the distribution, then apply top P">?</span></h3>
+          </div>
+          <div class="row">
+            <div class="col-9">
+              <input type="range" value="1" min="0" max="1" step="0.01" class="w-100 align-middle" />
+            </div>
+            <div class="col-3">
+              <input type="text" class="w-100" value="1" />
+            </div>
+          </div>
+          <div class="row chart mt-2" />
+        </div>
+      </div>
     </div>
     <div class="row" id="retained">
       <table class="table table-striped text-end">

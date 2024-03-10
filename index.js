@@ -81,7 +81,7 @@ const samplers = {
 			chart.appendChild(bar);
 			P += probs[tok];
 			i += 1;
-			if(P - probs[tok] >= p) {
+			if(P - probs[tok] > p) {
 				delete probs[tok];
 			}
 		}
@@ -202,6 +202,50 @@ const samplers = {
 		bar.setAttribute('style', 'width: 100%; left: 0; height: '
 				 + (100.0 * (1.0 - z)).toFixed(2) + '%; top: '
 				 + (100.0 * z).toFixed(2) + '%;');
+		bar.classList.add('cutoff');
+		chart.appendChild(bar);
+		return probs;
+	},
+	typ_p: (tokens, probs) => {
+		let p = $("input#typ_p").closest('div.alert').find('input[type="range"]').val();
+		let chart = $("input#typ_p").closest('div.alert').find('div.chart').empty()[0], bar;
+		let tok_shifted = [], total_entropy = 0.0, P = 0.0, i = 0;
+		probs = normalize(tokens, probs);
+		for(let tok of tokens) {
+			let l = -Math.log(probs[tok]);
+			total_entropy += probs[tok] * l;
+			tok_shifted.push([ tok, l ]);
+		}
+		for(let i in tok_shifted) {
+			tok_shifted[i][1] = Math.abs(tok_shifted[i][1] - total_entropy);
+		}
+		tok_shifted.sort((a, b) => a[1] - b[1]);
+		for(let i in tok_shifted) {
+			let tok = tok_shifted[i][0];
+			bar = document.createElement('div');
+			bar.classList.add('vbar');
+			bar.setAttribute('style', vbar_width
+					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
+					 + '%; top: calc(' + (100.0 * P).toFixed(2)
+					 + '% - 1px); height: calc(' + (100.0 * probs[tok]).toFixed(2) + '% + 1px);');
+			chart.appendChild(bar);
+			bar = document.createElement('div');
+			bar.classList.add('vbar');
+			bar.classList.add('vbar_top_p');
+			bar.setAttribute('style', vbar_width
+					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
+					 + '%; top: calc(' + (100.0 * (P + probs[tok])).toFixed(2)
+					 + '% - 1px); height: calc(' + (100.0 * (1.0 - P - probs[tok])).toFixed(2) + '% + 1px);');
+			chart.appendChild(bar);
+			P += probs[tok];
+			if(P - probs[tok] > p) {
+				delete probs[tok];
+			}
+		}
+		bar = document.createElement('div');
+		bar.setAttribute('style', 'width: 100%; left: 0; height: '
+				 + (100.0 * (1.0 - p)).toFixed(2) + '%; top: '
+				 + (100.0 * p).toFixed(2) + '%;');
 		bar.classList.add('cutoff');
 		chart.appendChild(bar);
 		return probs;
