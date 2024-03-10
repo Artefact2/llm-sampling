@@ -37,14 +37,13 @@ const samplers = {
 		let i = 0;
 		let cols = max_tokens;
 		let width = "width: calc(" + (100.0 / cols).toFixed(2) + '% - 1px);';
-		probs = normalize(tokens, probs);
 		for(let tok of tokens) {
 			bar = document.createElement('div');
 			let p = probs[tok] / probs[tokens[0]];
 			bar.setAttribute('style', width
-					 + 'height: ' + (100.0 * p).toFixed(2)
-					 + '%; top: ' + (100.0 * (1.0 - p)).toFixed(2)
-					 + '%; left: ' + (100.0 * i / cols).toFixed(2) + '%;');
+					 + 'height: calc(' + (100.0 * p).toFixed(2)
+					 + '% + 1px); top: calc(' + (100.0 * (1.0 - p)).toFixed(2)
+					 + '% - 1px); left: ' + (100.0 * i / cols).toFixed(2) + '%;');
 			bar.classList.add('vbar');
 			chart.appendChild(bar);
 			if(++i > k) {
@@ -69,8 +68,16 @@ const samplers = {
 			bar.classList.add('vbar');
 			bar.setAttribute('style', width
 					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
-					 + '%; top: ' + (100.0 * P).toFixed(2)
-					 + '%; height: ' + (100.0 * probs[tok]).toFixed(2) + '%;');
+					 + '%; top: calc(' + (100.0 * P).toFixed(2)
+					 + '% - 1px); height: calc(' + (100.0 * probs[tok]).toFixed(2) + '% + 1px);');
+			chart.appendChild(bar);
+			bar = document.createElement('div');
+			bar.classList.add('vbar');
+			bar.classList.add('top_p');
+			bar.setAttribute('style', width
+					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
+					 + '%; top: calc(' + (100.0 * (P + probs[tok])).toFixed(2)
+					 + '% - 1px); height: calc(' + (100.0 * (1.0 - P - probs[tok])).toFixed(2) + '% + 1px);');
 			chart.appendChild(bar);
 			P += probs[tok];
 			i += 1;
@@ -98,9 +105,9 @@ const samplers = {
 			bar = document.createElement('div');
 			let p = probs[tok] / probs[tokens[0]];
 			bar.setAttribute('style', width
-					 + 'height: ' + (100.0 * p).toFixed(2)
-					 + '%; top: ' + (100.0 * (1.0 - p)).toFixed(2)
-					 + '%; left: ' + (100.0 * i / cols).toFixed(2) + '%;');
+					 + 'height: calc(' + (100.0 * p).toFixed(2)
+					 + '% + 1px); top: calc(' + (100.0 * (1.0 - p)).toFixed(2)
+					 + '% - 1px); left: ' + (100.0 * i / cols).toFixed(2) + '%;');
 			bar.classList.add('vbar');
 			chart.appendChild(bar);
 			if(probs[tok] < cutoff) {
@@ -119,14 +126,40 @@ const samplers = {
 	top_a: (tokens, probs) => {
 		if(tokens.length === 0) return probs;
 		let a = $("input#top_a").closest('div.alert').find('input[type="range"]').val();
+		let chart = $("input#top_a").closest('div.alert').find('div.chart').empty()[0], bar;
+		let width = "width: calc(" + (100.0 / max_tokens).toFixed(2) + '% - 1px);', height, extra_height;
 		probs = normalize(tokens, probs);
-		let cutoff = probs[tokens[0]] * probs[tokens[0]] * a;
-		probs = normalize(tokens, probs);
+		let cutoff = Math.pow(probs[tokens[0]], 2.0) * a;
+		let i = 0;
 		for(let tok of tokens) {
+			bar = document.createElement('div');
+			height = probs[tok] / probs[tokens[0]];
+			bar.setAttribute('style', width
+					 + 'height: calc(' + (100.0 * height).toFixed(2)
+					 + '% + 1px); top: calc(' + (100.0 * (1.0 - height)).toFixed(2)
+					 + '% - 1px); left: ' + (100.0 * i / max_tokens).toFixed(2) + '%;');
+			bar.classList.add('vbar');
+			chart.appendChild(bar);
+			bar = document.createElement('div');
+			extra_height = (probs[tok] / Math.pow(probs[tokens[0]], 2.0) - probs[tok] / probs[tokens[0]]);
+			bar.setAttribute('style', width
+					 + 'height: ' + (100.0 * extra_height).toFixed(2)
+					 + '%; top: ' + (100.0 * (1.0 - height - extra_height)).toFixed(2)
+					 + '%; left: ' + (100.0 * i / max_tokens).toFixed(2) + '%;');
+			bar.classList.add('vbar');
+			bar.classList.add('top_a');
+			chart.appendChild(bar);
 			if(probs[tok] < cutoff) {
 				delete probs[tok];
 			}
+			++i;
 		}
+		bar = document.createElement('div');
+		bar.setAttribute('style', 'width: 100%; left: 0; height: '
+				 + (100.0 * a).toFixed(2) + '%; top: '
+				 + (100.0 * (1.0 - a)).toFixed(2) + '%;');
+		bar.classList.add('cutoff');
+		chart.appendChild(bar);
 		return probs;
 	},
 	tfs_z: (tokens, probs) => {

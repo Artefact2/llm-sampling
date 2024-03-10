@@ -20,6 +20,8 @@
       span.has-tooltip { display: inline-block; text-align: center; border: 1px solid black; border-radius: 100%; width: 1.2em; height: 1.2em; font-size: 0.8em; }
       div.chart { position: relative; height: 8em; overflow: hidden; }
       div.chart > div.vbar { position: absolute; background-color: rgb(var(--bs-primary-rgb)); padding: 0; }
+      div.chart > div.vbar.top_a { background-color: rgb(var(--bs-success-rgb)); opacity: 0.5; }
+      div.chart > div.vbar.top_p { opacity: 0.5; }
       div.chart > div.cutoff { position: absolute; opacity: 0.2; background: red; }
     </style>
   </head>
@@ -141,6 +143,7 @@
               <input type="text" class="w-100" value="0" />
             </div>
           </div>
+          <div class="row chart mt-2" />
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
