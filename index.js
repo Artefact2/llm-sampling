@@ -1,3 +1,5 @@
+"use strict";
+
 let prompts;
 let max_tokens, vbar_width;
 
@@ -129,7 +131,7 @@ const samplers = {
 		let i = 0;
 		for(let tok of tokens) {
 			bar = document.createElement('div');
-			height = probs[tok] / probs[tokens[0]];
+			let height = probs[tok] / probs[tokens[0]];
 			bar.setAttribute('style', vbar_width
 					 + 'height: calc(' + (100.0 * height).toFixed(2)
 					 + '% + 1px); top: calc(' + (100.0 * (1.0 - height)).toFixed(2)
@@ -137,7 +139,7 @@ const samplers = {
 			bar.classList.add('vbar');
 			chart.appendChild(bar);
 			bar = document.createElement('div');
-			extra_height = (probs[tok] / Math.pow(probs[tokens[0]], 2.0) - probs[tok] / probs[tokens[0]]);
+			let extra_height = (probs[tok] / Math.pow(probs[tokens[0]], 2.0) - probs[tok] / probs[tokens[0]]);
 			bar.setAttribute('style', vbar_width
 					 + 'height: ' + (100.0 * extra_height).toFixed(2)
 					 + '%; top: ' + (100.0 * (1.0 - height - extra_height)).toFixed(2)
@@ -161,8 +163,7 @@ const samplers = {
 	tfs_z: (tokens, probs) => {
 		if(tokens.length <= 2) return probs;
 		let z = $("input#tfs_z").closest('div.alert').find('input[type="range"]').val();
-		if(z >= 1.0) return probs;
-		let chart = $("input#tfs_z").closest('div.alert').find('div.chart').empty()[0];
+		let chart = $("input#tfs_z").closest('div.alert').find('div.chart').empty()[0], bar;
 		let d1 = [], d2 = [], d2_val, d2_sum = 0.0, N = tokens.length;
 		for(let i = 0; i < tokens.length - 1; ++i) {
 			d1.push(probs[tokens[i]] - probs[tokens[i+1]]);
@@ -173,11 +174,36 @@ const samplers = {
 		}
 		let cutoff = d2_sum * z, total = 0.0;
 		for(let i = 0; i < tokens.length; ++i) {
-			if(i < d2.length) total += d2[i];
+			if(i < d2.length) {
+				bar = document.createElement('div');
+				let height = d2[i] / d2_sum;
+				bar.setAttribute('style', vbar_width
+						 + 'height: calc(' + (100.0 * height).toFixed(2)
+						 + '% + 1px); top: calc(' + (100.0 * (total / d2_sum)).toFixed(2)
+						 + '% - 1px); left: ' + (100.0 * i / max_tokens).toFixed(2) + '%;');
+				bar.classList.add('vbar');
+				bar.classList.add('vbar_tfs_z2');
+				chart.appendChild(bar);
+				bar = document.createElement('div');
+				bar.setAttribute('style', vbar_width
+						 + 'height: ' + (100.0 * (1 - height)).toFixed(2)
+						 + '%; top: ' + (100.0 * (total / d2_sum + height)).toFixed(2)
+						 + '%; left: ' + (100.0 * i / max_tokens).toFixed(2) + '%;');
+				bar.classList.add('vbar');
+				bar.classList.add('vbar_tfs_z2s');
+				chart.appendChild(bar);
+				total += d2[i];
+			}
 			if(i >= 1 && total > cutoff) {
 				delete probs[tokens[i]];
 			}
 		}
+		bar = document.createElement('div');
+		bar.setAttribute('style', 'width: 100%; left: 0; height: '
+				 + (100.0 * (1.0 - z)).toFixed(2) + '%; top: '
+				 + (100.0 * z).toFixed(2) + '%;');
+		bar.classList.add('cutoff');
+		chart.appendChild(bar);
 		return probs;
 	},
 };
