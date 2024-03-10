@@ -1,5 +1,5 @@
 let prompts;
-let max_tokens;
+let max_tokens, vbar_width;
 
 const samplers = {
 	temperature: (tokens, probs) => {
@@ -36,11 +36,10 @@ const samplers = {
 		let chart = $("input#top_k").closest('div.alert').find('div.chart').empty()[0], bar;
 		let i = 0;
 		let cols = max_tokens;
-		let width = "width: calc(" + (100.0 / cols).toFixed(2) + '% - 1px);';
 		for(let tok of tokens) {
 			bar = document.createElement('div');
 			let p = probs[tok] / probs[tokens[0]];
-			bar.setAttribute('style', width
+			bar.setAttribute('style', vbar_width
 					 + 'height: calc(' + (100.0 * p).toFixed(2)
 					 + '% + 1px); top: calc(' + (100.0 * (1.0 - p)).toFixed(2)
 					 + '% - 1px); left: ' + (100.0 * i / cols).toFixed(2) + '%;');
@@ -60,21 +59,20 @@ const samplers = {
 	top_p: (tokens, probs) => {
 		let p = $("input#top_p").closest('div.alert').find('input[type="range"]').val();
 		let chart = $("input#top_p").closest('div.alert').find('div.chart').empty()[0], bar;
-		let width = "width: calc(" + (100.0 / max_tokens).toFixed(2) + "% - 1px);";
 		let i = 0, P = 0.0;
 		probs = normalize(tokens, probs);
 		for(let tok of tokens) {
 			bar = document.createElement('div');
 			bar.classList.add('vbar');
-			bar.setAttribute('style', width
+			bar.setAttribute('style', vbar_width
 					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
 					 + '%; top: calc(' + (100.0 * P).toFixed(2)
 					 + '% - 1px); height: calc(' + (100.0 * probs[tok]).toFixed(2) + '% + 1px);');
 			chart.appendChild(bar);
 			bar = document.createElement('div');
 			bar.classList.add('vbar');
-			bar.classList.add('top_p');
-			bar.setAttribute('style', width
+			bar.classList.add('vbar_top_p');
+			bar.setAttribute('style', vbar_width
 					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
 					 + '%; top: calc(' + (100.0 * (P + probs[tok])).toFixed(2)
 					 + '% - 1px); height: calc(' + (100.0 * (1.0 - P - probs[tok])).toFixed(2) + '% + 1px);');
@@ -98,13 +96,12 @@ const samplers = {
 		let p = $("input#min_p").closest('div.alert').find('input[type="range"]').val();
 		let chart = $("input#min_p").closest('div.alert').find('div.chart').empty()[0], bar;
 		let cols = max_tokens;
-		let width = "width: calc(" + (100.0 / cols).toFixed(2) + '% - 1px);';
 		let cutoff = probs[tokens[0]] * p;
 		let i = 0;
 		for(let tok of tokens) {
 			bar = document.createElement('div');
 			let p = probs[tok] / probs[tokens[0]];
-			bar.setAttribute('style', width
+			bar.setAttribute('style', vbar_width
 					 + 'height: calc(' + (100.0 * p).toFixed(2)
 					 + '% + 1px); top: calc(' + (100.0 * (1.0 - p)).toFixed(2)
 					 + '% - 1px); left: ' + (100.0 * i / cols).toFixed(2) + '%;');
@@ -127,14 +124,13 @@ const samplers = {
 		if(tokens.length === 0) return probs;
 		let a = $("input#top_a").closest('div.alert').find('input[type="range"]').val();
 		let chart = $("input#top_a").closest('div.alert').find('div.chart').empty()[0], bar;
-		let width = "width: calc(" + (100.0 / max_tokens).toFixed(2) + '% - 1px);', height, extra_height;
 		probs = normalize(tokens, probs);
 		let cutoff = Math.pow(probs[tokens[0]], 2.0) * a;
 		let i = 0;
 		for(let tok of tokens) {
 			bar = document.createElement('div');
 			height = probs[tok] / probs[tokens[0]];
-			bar.setAttribute('style', width
+			bar.setAttribute('style', vbar_width
 					 + 'height: calc(' + (100.0 * height).toFixed(2)
 					 + '% + 1px); top: calc(' + (100.0 * (1.0 - height)).toFixed(2)
 					 + '% - 1px); left: ' + (100.0 * i / max_tokens).toFixed(2) + '%;');
@@ -142,12 +138,12 @@ const samplers = {
 			chart.appendChild(bar);
 			bar = document.createElement('div');
 			extra_height = (probs[tok] / Math.pow(probs[tokens[0]], 2.0) - probs[tok] / probs[tokens[0]]);
-			bar.setAttribute('style', width
+			bar.setAttribute('style', vbar_width
 					 + 'height: ' + (100.0 * extra_height).toFixed(2)
 					 + '%; top: ' + (100.0 * (1.0 - height - extra_height)).toFixed(2)
 					 + '%; left: ' + (100.0 * i / max_tokens).toFixed(2) + '%;');
 			bar.classList.add('vbar');
-			bar.classList.add('top_a');
+			bar.classList.add('vbar_top_a');
 			chart.appendChild(bar);
 			if(probs[tok] < cutoff) {
 				delete probs[tok];
@@ -166,6 +162,7 @@ const samplers = {
 		if(tokens.length <= 2) return probs;
 		let z = $("input#tfs_z").closest('div.alert').find('input[type="range"]').val();
 		if(z >= 1.0) return probs;
+		let chart = $("input#tfs_z").closest('div.alert').find('div.chart').empty()[0];
 		let d1 = [], d2 = [], d2_val, d2_sum = 0.0, N = tokens.length;
 		for(let i = 0; i < tokens.length - 1; ++i) {
 			d1.push(probs[tokens[i]] - probs[tokens[i+1]]);
@@ -260,6 +257,7 @@ $(() => {
 	}
 
 	max_tokens = $("input#top_k").closest('div.alert').find('input[type="range"]').attr('max');
+	vbar_width = 'width: calc(' + (100.0 / max_tokens).toFixed(2) + '% - 1px);';
 
 	$("[data-bs-toggle='tooltip']").each((i, e) => new bootstrap.Tooltip(e));
 	$("select#prompts").on('change', update_prompt);
