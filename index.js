@@ -6,7 +6,7 @@ const samplers = {
 		if(tokens.length <= 1) return probs;
 		let T = $("input#temperature-T").val();
 		if($("input#temperature-dyn").prop('checked')) {
-			let range = $("input#temperature-dyn-range").val();
+			let range = Math.min(T, $("input#temperature-dyn-range").val());
 			let expo = $("input#temperature-dyn-exponent").val();
 			/* reference: https://github.com/YellowRoseCx/koboldcpp-rocm/blob/main/llama.cpp#L10652-L10670 */
 			probs = normalize(tokens, probs);
@@ -14,7 +14,7 @@ const samplers = {
 			for(let tok of tokens) {
 				entropy -= probs[tok] * Math.log(probs[tok]);
 			}
-			T = Math.max(0.0, T - range) + 2 * range * Math.pow(entropy / max_entropy, expo);
+			T = (T - range) + 2 * range * Math.pow(entropy / max_entropy, expo);
 		}
 		T = 1.0 / T;
 		for(let tok of tokens) {
