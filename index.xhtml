@@ -18,6 +18,9 @@
       div#samplers > div { opacity: 0.5; cursor: grab; }
       div#samplers > div:has(h3 > input:checked) { opacity: 1; }
       span.has-tooltip { display: inline-block; text-align: center; border: 1px solid black; border-radius: 100%; width: 1.2em; height: 1.2em; font-size: 0.8em; }
+      div.chart { position: relative; height: 8em; overflow: hidden; }
+      div.chart > div.vbar { position: absolute; background-color: rgb(var(--bs-primary-rgb)); padding: 0; }
+      div.chart > div.cutoff { position: absolute; opacity: 0.2; background: red; }
     </style>
   </head>
   <body class="container mt-4">
@@ -90,6 +93,7 @@
               <input type="text" class="w-100" value="50" />
             </div>
           </div>
+          <div class="row chart mt-2" />
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
@@ -105,6 +109,7 @@
               <input type="text" class="w-100" value="1" />
             </div>
           </div>
+          <div class="how chart mt-2" />
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
@@ -120,6 +125,7 @@
               <input type="text" class="w-100" value="0" />
             </div>
           </div>
+          <div class="row chart mt-2" />
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">

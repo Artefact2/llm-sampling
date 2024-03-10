@@ -1,4 +1,5 @@
 let prompts;
+let max_tokens;
 
 const samplers = {
 	temperature: (tokens, probs) => {
@@ -32,36 +33,87 @@ const samplers = {
 	},
 	top_k: (tokens, probs) => {
 		let k = $("input#top_k").closest('div.alert').find('input[type="range"]').val();
+		let chart = $("input#top_k").closest('div.alert').find('div.chart').empty()[0], bar;
 		let i = 0;
+		let cols = max_tokens;
+		let width = "width: calc(" + (100.0 / cols).toFixed(2) + '% - 1px);';
+		probs = normalize(tokens, probs);
 		for(let tok of tokens) {
+			bar = document.createElement('div');
+			let p = probs[tok] / probs[tokens[0]];
+			bar.setAttribute('style', width
+					 + 'height: ' + (100.0 * p).toFixed(2)
+					 + '%; top: ' + (100.0 * (1.0 - p)).toFixed(2)
+					 + '%; left: ' + (100.0 * i / cols).toFixed(2) + '%;');
+			bar.classList.add('vbar');
+			chart.appendChild(bar);
 			if(++i > k) {
 				delete probs[tok];
 			}
 		}
+		bar = document.createElement('div');
+		bar.setAttribute('style', 'height: 100%; top: 0; left: '
+				 + (100.0 * k / 50).toFixed(2) + '%;');
+		bar.classList.add('cutoff');
+		chart.appendChild(bar);
 		return probs;
 	},
 	top_p: (tokens, probs) => {
 		let p = $("input#top_p").closest('div.alert').find('input[type="range"]').val();
+		let chart = $("input#top_p").closest('div.alert').find('div.chart').empty()[0], bar;
+		let width = "width: calc(" + (100.0 / max_tokens).toFixed(2) + "% - 1px);";
 		let i = 0, P = 0.0;
 		probs = normalize(tokens, probs);
 		for(let tok of tokens) {
-			if(P >= p) {
+			bar = document.createElement('div');
+			bar.classList.add('vbar');
+			bar.setAttribute('style', width
+					 + 'left: ' + (100 * i / max_tokens).toFixed(2)
+					 + '%; top: ' + (100.0 * P).toFixed(2)
+					 + '%; height: ' + (100.0 * probs[tok]).toFixed(2) + '%;');
+			chart.appendChild(bar);
+			P += probs[tok];
+			i += 1;
+			if(P - probs[tok] >= p) {
 				delete probs[tok];
-			} else {
-				P += probs[tok];
 			}
 		}
+		bar = document.createElement('div');
+		bar.setAttribute('style', 'width: 100%; left: 0; height: '
+				 + (100.0 * (1.0 - p)).toFixed(2) + '%; top: '
+				 + (100.0 * p).toFixed(2) + '%;');
+		bar.classList.add('cutoff');
+		chart.appendChild(bar);
 		return probs;
 	},
 	min_p: (tokens, probs) => {
 		if(tokens.length === 0) return probs;
 		let p = $("input#min_p").closest('div.alert').find('input[type="range"]').val();
+		let chart = $("input#min_p").closest('div.alert').find('div.chart').empty()[0], bar;
+		let cols = max_tokens;
+		let width = "width: calc(" + (100.0 / cols).toFixed(2) + '% - 1px);';
 		let cutoff = probs[tokens[0]] * p;
+		let i = 0;
 		for(let tok of tokens) {
+			bar = document.createElement('div');
+			let p = probs[tok] / probs[tokens[0]];
+			bar.setAttribute('style', width
+					 + 'height: ' + (100.0 * p).toFixed(2)
+					 + '%; top: ' + (100.0 * (1.0 - p)).toFixed(2)
+					 + '%; left: ' + (100.0 * i / cols).toFixed(2) + '%;');
+			bar.classList.add('vbar');
+			chart.appendChild(bar);
 			if(probs[tok] < cutoff) {
 				delete probs[tok];
 			}
+			++i;
 		}
+		bar = document.createElement('div');
+		bar.setAttribute('style', 'width: 100%; left: 0; height: '
+				 + (100.0 * p).toFixed(2) + '%; top: '
+				 + (100.0 * (1.0 - p)).toFixed(2) + '%;');
+		bar.classList.add('cutoff');
+		chart.appendChild(bar);
 		return probs;
 	},
 	top_a: (tokens, probs) => {
@@ -173,6 +225,8 @@ $(() => {
 			$(e.target).closest('div.row').find('input[type="' + types[1-i] + '"]').val(v);
 		});
 	}
+
+	max_tokens = $("input#top_k").closest('div.alert').find('input[type="range"]').attr('max');
 
 	$("[data-bs-toggle='tooltip']").each((i, e) => new bootstrap.Tooltip(e));
 	$("select#prompts").on('change', update_prompt);
